@@ -1,76 +1,93 @@
 % This is main file of algorithm
 
-path = '../data/segmented/';
-filename = 'norm.jpg';
+root = '../data/';
+path_i = 'initial/';
+path_s = 'segmented/';
+filename = 'all2';
+fileformat = '.jpg';
 
-I = imread(strcat(path, filename));
+I = imread(strcat(root, path_s, filename, fileformat));
+II = imread(strcat(root, path_i, filename, fileformat));
 M = I(:, :, 1)>I(:, :, 2);
 
 se = strel('disk',4);
 se2 = strel('disk',2);
-
 M = imdilate(imerode(M, se), se2);
-rp = regionprops(M, 'Centroid', 'MajorAxisLength', 'MinorAxisLength', 'Orientation');
-B = edge(M);
+rp = regionprops(M, 'Centroid', 'MajorAxisLength', 'MinorAxisLength', 'Orientation', 'PixelList');
 
-if rp.Orientation<0
-    alpha = rp.Orientation + 90 + 30;
-else
-    alpha = rp.Orientation - 30;
+cX = round(rp.Centroid(1));
+cY = round(rp.Centroid(2));
+
+sizeL = size(rp.PixelList, 1);
+areas_unsorted = {};
+dist_unsorted = {};
+for i=1:sizeL
+    p = rp.PixelList(i, :);
+    alpha = round((atan2(cX-p(1), cY-p(2))*180/pi + 180) / 2) + 1;
+    if size(areas_unsorted, 2) < alpha
+        areas_unsorted{alpha} = [p];
+        dist_unsorted{alpha} = [sqrt((p(2)-cY)^2 + (p(1)-cX)^2)];
+    else
+        areas_unsorted{alpha} = [areas_unsorted{alpha}; p];
+        dist_unsorted{alpha} = [dist_unsorted{alpha}, sqrt((p(2)-cY)^2 + (p(1)-cX)^2)];
+    end
 end
 
-cX = rp.Centroid(1);
-cY = rp.Centroid(2);
-minX = cX - (rp.MajorAxisLength/2)*cosd(alpha);
-
-k = tand(180-alpha);
-b = cY - k * cX;
-
-imshow(B);
-
-upPoints = [];
-downPoints = []; 
-for x = minX:5:cX
-     midY = k * x + b;
-     minY = midY - (rp.MinorAxisLength/2)*sind(90-alpha);
-     maxY = midY + (rp.MinorAxisLength/2)*sind(90-alpha);
-     k1 = tand(90-alpha);
-     b1 = midY - k1*x;
-     pl = [];
-     for y = minY:cY
-        x2 = (y - b1)/k1;
-        if (B(floor(x2)-1, floor(y)-1)==1)
-            pl = [pl, [x2, y]];
-        end
-     end
-     downPoints = [downPoints, pl];
-     
-     pl = [];
-     for y = cY:maxY
-        x2 = (y - b1)/k1;
-        if (B(floor(x2)-1, floor(y)-1)==1)
-            pl = [pl, [x2, y]];
-        end
-     end
-     upPoints = [upPoints, pl];
-     line([(minY - b1)/k1, (maxY - b1)/k1], [minY, maxY]);
-     h = animatedline([cX, x], [cY, y]);
-     getpoints(h);
-end
-
-roundPoints = [];
-for phi=(alpha+90): -10 : (alpha-90)
-    pl = [];
-    x = cX + (rp.MajorAxisLength*2/3)*cosd(phi);
-    y = cY - (rp.MinorAxisLength*2/3)*sind(phi);
-    k = (cY-y)/(cX-x);
-    b = cY - k*cX;
-    for y2 = cY:y
-        x2 = (y2 - b)/k2;
-        if (B(floor(x2)-1, floor(y2)-1)==1)
-            pl = [pl, [x2, y2]];
+flag = 0;
+for i=1:size(areas_unsorted, 2)
+    if size(areas_unsorted{i}, 1)==0
+        if flag == 0
+            flag = 1;
+            st = i;
+        else
+            fin = i;
         end
     end
-    line([cX, x], [cY, y]);
-    roundPoints = [roundPoints, pl];
 end
+
+j = 1;
+areas = {};
+dist = {};
+for i = cat(2, (st-1):-1:1, size(areas_unsorted, 2):-1:(fin-1))
+    areas{j} = areas_unsorted{i};
+    dist{j} = dist_unsorted{i};
+    j = j+1;
+end
+
+m = 2;
+lines = {};
+for n=1:size(areas, 2)
+    pl = areas{n};
+    dl = dist{n};
+    ql = quantile(dl, m);
+    for i=1:(m+1)
+        lines{n, i} = [];
+    end
+    for i=1:size(pl, 1)
+        if dl(i)<ql(1)
+            if size(lines{n, 1}, 2) == 0
+                lines{n, 1} = [pl(i, :)];
+            else
+                lines{n, 1} = [lines{n, 1}; pl(i, :)];
+            end
+        end
+        for j=2:size(ql, 2)
+            if ql(j-1)<=dl(i) && dl(i)<ql(j)
+                if size(lines{n, j}, 2) == 0
+                    lines{n, j} = [pl(i, :)];
+                else
+                    lines{n, j} = [lines{n, j}; pl(i, :)];
+                end
+                break;    
+            end
+        end
+        if dl(i)>=ql(m)
+            if size(lines{n, m+1}, 2) == 0
+                lines{n, m+1} = [pl(i, :)];
+            else
+                lines{n, m+1} = [lines{n, m+1}; pl(i, :)];
+            end
+        end
+    end
+end
+
