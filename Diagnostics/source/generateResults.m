@@ -32,6 +32,9 @@ function generateResults(root, filename, II, lines, nOfSectors, cX, cY)
     end
     
     map(cY, cX, :) = 255;
-    imshow(map);
-
+    
+    imwrite(map, strcat(root, path, filename,'.png'));
+    plotStats(root, filename, means, '_means', cX, cY);
+    plotStats(root, filename, std_dev, '_std_dev', cX, cY);
+    plotStats(root, filename, qnl, '_quantile', cX, cY);
 end
