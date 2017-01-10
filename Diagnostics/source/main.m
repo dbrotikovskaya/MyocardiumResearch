@@ -91,3 +91,4 @@ for n=1:size(areas, 2)
     end
 end
 
+generateResults(root, filename, II, lines, m+1, cX, cY);
