@@ -14,7 +14,6 @@ function generateResults(root, filename, II, lines, nOfSectors, cX, cY)
     metadata = dicominfo(strcat(root, path_dcm, filename, '.dcm'));
     in = metadata.(dicomlookup('0028', '1052'));
     sl = metadata.(dicomlookup('0028', '1053'));
-    GI = rgb2gray(II);
     map = II;
     for i=1:size(lines, 1)
         pv = 255 - mod(i, 2)*100;
@@ -39,7 +38,12 @@ function generateResults(root, filename, II, lines, nOfSectors, cX, cY)
     map(cY, cX, :) = 255;
     
     imwrite(map, strcat(root, path_res, filename,'.png'));
-    plotStats(root, filename, means, '_means', cX, cY);
-    plotStats(root, filename, std_dev, '_std_dev', cX, cY);
-    plotStats(root, filename, qnl, '_quantile', cX, cY);
+    
+    plotStats(root, filename, means, '_means');
+    plotStats(root, filename, std_dev, '_std_dev');
+    plotStats(root, filename, qnl, '_quantile');
+    
+    logStats(root, filename, means, '_means');
+    logStats(root, filename, std_dev, '_std_dev');
+    logStats(root, filename, qnl, '_quantile');
 end

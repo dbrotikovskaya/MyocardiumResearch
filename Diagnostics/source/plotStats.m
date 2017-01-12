@@ -1,4 +1,4 @@
-function plotStats(root, filename, stat, statname, cX, cY)
+function plotStats(root, filename, stat, statname)
     path = 'results/';
     for i=1:size(stat, 1)
         fig = figure
@@ -20,6 +20,6 @@ function plotStats(root, filename, stat, statname, cX, cY)
         grid minor
         title('Outer line')
 
-        map(cY, cX, :) = 255;
         print(fig,strcat(root, path, filename, statname,int2str(i)),'-dpdf');
-end
+    end
+    
