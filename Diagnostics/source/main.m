@@ -3,7 +3,7 @@
 root = '../data/';
 path_i = 'initial/';
 path_s = 'segmented/';
-filename = 'hyp';
+filename = 'ryth';
 fileformat = '.jpg';
 
 I = imread(strcat(root, path_s, filename, fileformat));
@@ -33,9 +33,10 @@ for i=1:sizeL
     end
 end
 
+
 flag = 0;
 for i=1:size(areas_unsorted, 2)
-    if size(areas_unsorted{i}, 1)==0
+    if size(areas_unsorted{i}, 1)<3
         if flag == 0
             flag = 1;
             st = i;
@@ -48,7 +49,7 @@ end
 j = 1;
 areas = {};
 dist = {};
-for i = cat(2, (st-1):-1:1, size(areas_unsorted, 2):-1:(fin-1))
+for i = cat(2, (st-1):-1:1, size(areas_unsorted, 2):-1:(fin+1))
     areas{j} = areas_unsorted{i};
     dist{j} = dist_unsorted{i};
     j = j+1;
