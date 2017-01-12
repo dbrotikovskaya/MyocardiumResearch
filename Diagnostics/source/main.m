@@ -3,7 +3,7 @@
 root = '../data/';
 path_i = 'initial/';
 path_s = 'segmented/';
-filename = 'all2';
+filename = 'hyp';
 fileformat = '.jpg';
 
 I = imread(strcat(root, path_s, filename, fileformat));
