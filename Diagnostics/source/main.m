@@ -3,16 +3,13 @@
 root = '../data/';
 path_i = 'initial/';
 path_s = 'segmented/';
-filename = 'ryth';
-fileformat = '.jpg';
+filename = 'all2';
 
-I = imread(strcat(root, path_s, filename, fileformat));
-II = imread(strcat(root, path_i, filename, fileformat));
+I = imread(strcat(root, path_s, filename, '.png'));
+II = imread(strcat(root, path_i, filename, '.jpg'));
 M = I(:, :, 1)>I(:, :, 2);
 
-se = strel('disk',4);
-se2 = strel('disk',2);
-M = imdilate(imerode(M, se), se2);
+M = imfill(M, 'holes');
 rp = regionprops(M, 'Centroid', 'MajorAxisLength', 'MinorAxisLength', 'Orientation', 'PixelList');
 
 cX = round(rp.Centroid(1));

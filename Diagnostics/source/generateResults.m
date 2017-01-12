@@ -14,6 +14,7 @@ function generateResults(root, filename, II, lines, nOfSectors, cX, cY)
     metadata = dicominfo(strcat(root, path_dcm, filename, '.dcm'));
     in = metadata.(dicomlookup('0028', '1052'));
     sl = metadata.(dicomlookup('0028', '1053'));
+    
     map = II;
     for i=1:size(lines, 1)
         pv = 255 - mod(i, 2)*100;
