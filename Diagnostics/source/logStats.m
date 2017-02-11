@@ -1,7 +1,7 @@
 function logStats(root, filename, stat, statname)
     path = 'results/';
     for i=1:size(stat, 1)
-        ffn = strcat(root, path, filename, statname,int2str(i),'.csv');
+        ffn = strcat(root, path, filename, statname,int2str(i),'.txt');
         stat_matx = [];
         for j=1:size(stat{i, 1}, 2)
              line = j;
