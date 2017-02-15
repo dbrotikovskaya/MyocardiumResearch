@@ -20,7 +20,7 @@ areas_unsorted = {};
 dist_unsorted = {};
 for i=1:sizeL
     p = rp.PixelList(i, :);
-    alpha = round((atan2(cX-p(1), cY-p(2))*180/pi + 180) / 2) + 1;
+    alpha = round((atan2(cX-p(1), cY-p(2))*180/pi + 180) / 3) + 1;
     if size(areas_unsorted, 2) < alpha
         areas_unsorted{alpha} = [p];
         dist_unsorted{alpha} = [sqrt((p(2)-cY)^2 + (p(1)-cX)^2)];
@@ -29,7 +29,6 @@ for i=1:sizeL
         dist_unsorted{alpha} = [dist_unsorted{alpha}, sqrt((p(2)-cY)^2 + (p(1)-cX)^2)];
     end
 end
-
 
 flag = 0;
 for i=1:size(areas_unsorted, 2)
@@ -89,4 +88,4 @@ for n=1:size(areas, 2)
     end
 end
 
-generateResults(root, filename, II, lines, m+1, cX, cY);
+generateResults(root, filename, II, lines, m+1, cX, cY, 0);

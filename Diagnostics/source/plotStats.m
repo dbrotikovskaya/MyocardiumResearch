@@ -1,5 +1,5 @@
 function plotStats(root, filename, stat, statname)
-    path = 'results/';
+    path = 'results/plots/';
     for i=1:size(stat, 1)
         fig = figure
         subplot(3, 1, 1)

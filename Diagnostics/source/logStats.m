@@ -1,5 +1,5 @@
 function logStats(root, filename, stat, statname)
-    path = 'results/';
+    path = 'results/logs/';
     for i=1:size(stat, 1)
         ffn = strcat(root, path, filename, statname,int2str(i),'.txt');
         stat_matx = [];
