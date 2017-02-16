@@ -88,4 +88,8 @@ for n=1:size(areas, 2)
     end
 end
 
-generateResults(root, filename, II, lines, m+1, cX, cY, 0);
+for k=3:2:9
+    isoMap(root, filename, II, M, k);
+end
+%generateResults(root, filename, II, lines, m+1, cX, cY, 0);
+
