@@ -3,7 +3,7 @@
 root = '../data/';
 path_i = 'initial/';
 path_s = 'segmented/';
-filename = 'all2';
+filename = 'all1';
 
 I = imread(strcat(root, path_s, filename, '.png'));
 II = imread(strcat(root, path_i, filename, '.jpg'));
@@ -91,5 +91,6 @@ end
 for k=3:2:9
     isoMap(root, filename, II, M, k);
 end
-%generateResults(root, filename, II, lines, m+1, cX, cY, 0);
+%generateResults(root, filename, II, lines, m+1, cX, cY, 'intensity/');
+%generateResults(root, filename, II, lines, m+1, cX, cY, 'density/');
 

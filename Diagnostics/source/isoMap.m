@@ -1,11 +1,14 @@
 function isoMap(root, filename, I, M, nOfLevels)
-    path = 'results/isocontours/maps/';
+    path = 'results/isocontours/';
     M = uint8(M);
     figure, imshow(I);
     hold on;
-    c = contour(I(:, :, 1).*M, nOfLevels);
+    [c, h] = contour(I(:, :, 1).*M, nOfLevels);
     hold on;
-    print(strcat(root, path, filename, '_', int2str(nOfLevels)), '-dpng');
+    print(strcat(root, path, 'maps/', filename, '_', int2str(nOfLevels)), '-dpng');
+    
+    ffn = strcat(root, path, 'levels/', int2str(nOfLevels), '_', filename, '.txt');
+    csvwrite(ffn, h.LevelList);
     
     sz = size(c, 2);
     i = 1;
