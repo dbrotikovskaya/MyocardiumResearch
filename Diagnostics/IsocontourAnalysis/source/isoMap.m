@@ -1,13 +1,12 @@
-function isoMap(root, filename, I, M, nOfLevels)
-    path = 'results/isocontours/';
+function isoMap(root, filename, I, M, nOfLevels, llist)
+    path = 'results/';
     M = uint8(M);
-    figure, imshow(I);
+    figure('Visible', 'off'), imshow(I);
     hold on;
-    [c, h] = contour(I(:, :, 1).*M, nOfLevels);
+    [c, h] = contour(I(:, :, 2).*M, llist);
     hold on;
-    print(strcat(root, path, 'maps/', filename, '_', int2str(nOfLevels)), '-dpng');
-    
     ffn = strcat(root, path, 'levels/', int2str(nOfLevels), '_', filename, '.txt');
+    print(strcat(root, path, 'maps/', int2str(nOfLevels), '_', filename), '-dpng');
     csvwrite(ffn, h.LevelList);
     
     sz = size(c, 2);
