@@ -2,11 +2,12 @@ close all;
 clear all;
 
 options.correctEndo = true;
-options.debug = false;
+options.debug = true;
+options.border = 40;
 
 % Reading test image and saving its sizes. 
 root = '../data/';
-testFilename = '1';
+testFilename = '10';
 I = imread(strcat(root, 'test/cropped/', testFilename, '.jpg'));
 nrows = size(I,1);
 ncols = size(I,2);
@@ -63,23 +64,30 @@ trainMyoM = imfill(trainMyoMRGB(:, :, 1)>trainMyoMRGB(:, :, 2), 'holes');
 
 scale = [double(testD2/trainD2), double(testD1/trainD1)];
 
-if options.debug==true
-    I2 = I(:, :, 2);
-    I2(edge(trainMyoM(1:size(I, 1), 1:size(I, 2))))=255;
+if options.debug == true
+    size1 = max(size(I, 1), size(trainMyoM, 1));
+    size2 = max(size(I, 2), size(trainMyoM, 2));
+    
+    trainMyoM2 = zeros(size1, size2);
+    trainMyoM2(1:size(trainMyoM, 1), 1:size(trainMyoM, 2)) = uint8(trainMyoM);
+    
+    I2 = uint8(zeros(size1, size2));
+    I2(1:size(I, 1), 1:size(I, 2)) = I(:, :, 2);
+    I2(edge(trainMyoM2)) = 255;
     imwrite(I2, strcat('../data/results/', testFilename, '_trainMyoMask.png'));
 end
 
-newTrainMyoM = affineTransform(trainMyoM, testA, trainA, scale, testEndoP1, ncols, nrows);
+newTrainMyoM = affineTransform(trainMyoM, testA, trainA, scale, testEndoP1, ncols, nrows, options.border);
 
 se = strel('disk',30);
 newTrainMyoM2 = imdilate(newTrainMyoM, se);
 
-heartM2 = uint8(zeros(size(heartM, 1) + 40, size(heartM, 2) + 40));
-heartM2(21:end-20, 21:end-20) = uint8(heartM);
+heartM2 = uint8(zeros(size(heartM, 1) + 2*options.border, size(heartM, 2) + 2*options.border));
+heartM2(options.border+1:end-options.border, options.border+1:end-options.border) = uint8(heartM);
 
 if options.debug==true
-    I2 = uint8(zeros(size(I, 1) + 40, size(I, 2) + 40));
-    I2(21:end-20, 21:end-20) = uint8(I(:, :, 2));
+    I2 = uint8(zeros(size(I, 1) + 2*options.border, size(I, 2) + 2*options.border));
+    I2(options.border+1:end-options.border, options.border+1:end-options.border) = uint8(I(:, :, 2));
     I2 = I2 .* uint8(newTrainMyoM2);
     I2(edge(heartM2))=255;
     imwrite(I2, strcat('../data/results/', testFilename, '_myoMaskDilated.png'));
@@ -87,7 +95,10 @@ end
 
 heartM2 = getMaxCC(heartM2 .* uint8(newTrainMyoM2));
 
-I2 = uint8(zeros(size(I, 1) + 40, size(I, 2) + 40));
-I2(21:end-20, 21:end-20) = uint8(I(:, :, 2));
-I2(edge(heartM2))=255;
+se = strel('disk',5);
+heartM3 = imdilate(getMaxCC(imerode(heartM2, se)), se);
+
+I2 = uint8(zeros(size(I, 1) + 2*options.border, size(I, 2) + 2*options.border));
+I2(options.border+1:end-options.border, options.border+1:end-options.border) = uint8(I(:, :, 2));
+I2(edge(heartM3))=255;
 imwrite(I2, strcat(root, 'results/final/', testFilename, '_final.png'));
