@@ -7,7 +7,7 @@ options.border = 40;
 
 % Reading test image and saving its sizes. 
 root = '../data/';
-testFilename = '9';
+testFilename = '1';
 I = imread(strcat(root, 'test/cropped/', testFilename, '.jpg'));
 nrows = size(I,1);
 ncols = size(I,2);
@@ -82,6 +82,14 @@ end
 % Applying affine transform (scale, rotation and shift of training myocardium
 % to fit test file).
 testMyoAreaM = affineTransform(trainMyoM, testA, trainA, scale, testEndoP1, ncols, nrows, options.border);
+
+% Showing myocardium mask taken from affine transform.
+if options.debug==true
+    MaskedI = uint8(zeros(size(I, 1) + 2*options.border, size(I, 2) + 2*options.border));
+    MaskedI(options.border+1:end-options.border, options.border+1:end-options.border) = uint8(I(:, :, 2));
+    MaskedI(edge(testMyoAreaM))=255;
+    imwrite(MaskedI, strcat('../data/results/affine_transform/', testFilename, '_myoMaskDilated.png'));
+end
 
 % Applying dilation to transformed myocardium mask to get myocardium area.
 se = strel('disk',30);
