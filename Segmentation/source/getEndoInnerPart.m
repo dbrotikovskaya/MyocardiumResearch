@@ -1,8 +1,8 @@
 function [endoMask, heartMask] = getEndoInnerPart(I, nrows, ncols, correctEndo)
 % Applying kmeans clustering to get the most intensive and the biggest area 
-%(inner part of endocardium).
+%(inner part of endocardium, left venticle) and main contour of heart.
  
-% Applying kmeans
+% Applying kmeans.
 ncolors = 4;
 I_list = reshape(double(I),nrows*ncols,1);
 c = [5; 80; 180];
@@ -11,21 +11,22 @@ pixel_labels = reshape(cluster_idx,nrows,ncols);
 
 % Getting a center of the cluster with highest intensity.
 [m, max_center] = max(cluster_center);
+
+% Gettint a center of the cluster with second lowest intensity.
 [m, min_center] = min(cluster_center);
-cluster_center(max_center) = NaN;
+cluster_center(min_center) = NaN;
+[m, i] = min(cluster_center);
 
-[m, i1] = max(cluster_center);
-i2 = 10 - i1 - max_center - min_center;
-
-% Getting a mask of these areas.
+% Getting a mask of most intensive areas.
 mostIntensiveAreas = pixel_labels == max_center;
 
-heartMask = (pixel_labels == i2);
-heartMask = getMaxCC(heartMask);
-
-% Getting the biggest connected component on the mask of hight intensity
-% areas.
+% Getting two biggest connected component on the mask of high intensity
+% areas (blood cluster), getting more left CC.
 endoMask = imfill(getMaxCC(mostIntensiveAreas), 'holes');
+
+% Getting a mask of second unintensive areas (heart tissue cluster).
+heartMask = (pixel_labels == i);
+heartMask = getMaxCC(heartMask);
 
 % Correcting the mask (optionally).
 if correctEndo==true
