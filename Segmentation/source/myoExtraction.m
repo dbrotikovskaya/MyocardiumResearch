@@ -3,7 +3,7 @@ clear all;
 
 options.correctEndo = true;
 options.debug = true;
-options.border = 40;
+options.border = 50;
 
 % Reading test image and saving its sizes. 
 root = '../data/';
